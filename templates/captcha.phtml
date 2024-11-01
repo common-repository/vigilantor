@@ -1,0 +1,32 @@
+<form id="vitor-form-captcha" method="post">
+    <input type="hidden" name="v_post_action" value="vitor_captcha">
+    <?= wp_nonce_field('vitor_captcha_form', 'vitor_captcha_form_nonce', true, false); ?>
+
+    <strong><?php _e('Solve the CAPTCHA below to view the site content.', 'vigilantor'); ?></strong>
+
+    <?php if ($captchaType == 'securimage'): ?>
+        <?= siwp_captcha_html(); ?>
+
+        <?php if (!empty($captcha_error)): ?>
+        <div class="error"><?= $captcha_error; ?></div>
+        <?php endif; ?>
+
+    <?php elseif ($captchaType == 'hcaptcha'): ?>
+        <script>
+            function submitVitorForm() {
+                document.getElementById("vitor-form-captcha").submit();
+            }
+        </script>
+        <?= str_replace('data-sitekey', 'data-callback="submitVitorForm" data-sitekey', (function_exists('hcap_display_hcaptcha') ? hcap_display_captcha() : hcap_form_display())); ?>
+
+        <?php if (!empty($captcha_error)): ?>
+        <div class="error vitor-captcha-error"><?= $captcha_error; ?></div>
+        <?php endif; ?>
+
+        <button class="vitor-submit-button" type="submit"><?= __('Submit Challenge', 'vigilantor'); ?></button>
+
+    <?php else: ?>
+        <?= 'Unknown vigilantor captcha configuration!'; ?>
+
+    <?php endif; ?>
+</form>

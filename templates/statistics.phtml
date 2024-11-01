@@ -1,0 +1,30 @@
+<h3><?php _e('Statistics', 'vigilantor') ?></h3>
+
+<?php
+$stats = array(
+    'login'        => (int)get_site_option('vitor_stat_login'),
+    'registration' => (int)get_site_option('vitor_stat_registration'),
+    'comments'     => (int)get_site_option('vitor_stat_comments'),
+    'trackbacks'   => (int)get_site_option('vitor_stat_trackbacks'),
+    'blockedviews' => (int)get_site_option('vitor_stat_blockedviews'),
+);
+
+$nothing = true;
+foreach($stats as $value) {
+    if ($value > 0) {
+        $nothing = false;
+        break;
+    }
+}
+
+if ($nothing): ?>
+<?php _e('Nothing blocked yet!', 'vigilantor') ?>
+<?php else: ?>
+<?php if ($stats['blockedviews'] > 0): ?>
+<strong><?php _e('Number of page views blocked:', 'vigilantor') ?></strong> <em><?php echo number_format($stats['blockedviews']) ?></em><br />
+<?php endif; ?>
+<strong><?php _e('Number of comments blocked:', 'vigilantor') ?></strong> <em><?php echo number_format($stats['comments']) ?></em><br />
+<strong><?php _e('Number of pingbacks/trackbacks blocked:', 'vigilantor') ?></strong> <em><?php echo number_format($stats['trackbacks']) ?></em><br />
+<strong><?php _e('Number of logins blocked:', 'vigilantor') ?></strong> <em><?php echo number_format($stats['login']) ?></em><br />
+<strong><?php _e('Number of registrations blocked:', 'vigilantor') ?></strong> <em><?php echo number_format($stats['registration']) ?></em><br />
+<?php endif; ?>

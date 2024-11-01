@@ -1,0 +1,47 @@
+<h3>Flagged Registrations</h3>
+
+<?php $users = $this->getFlaggedRegistrations(); ?>
+
+<div id="vitor_no_flagged_registrations"<?php if (sizeof($users) > 0) echo ' style="display: none"'; ?>>
+<?php _e('Currently, there are no flagged user registrations to show.', 'vigilantor') ?>
+</div>
+<table id="vitor_flagged_registrations"<?php if (sizeof($users) == 0) echo ' style="display: none"'; ?>>
+  <tr><th style="text-align: left; width: 150px">Username</th><th style="text-align: left; width: 220px">Email</th><th style="text-align: left; width: 150px">Date Registered</th><th style="text-align: left; width: 140px">IP Address</th><th style="text-align: left; width: 200px">Actions</th></tr>
+  <?php foreach($users as $user): ?>
+  <tr id="vitor_user_<?php echo $user->user_id ?>">
+    <td><a href="user-edit.php?user_id=<?php echo $user->user_id ?>&amp;wp_http_referer=<?php echo urlencode($_SERVER['REQUEST_URI']) ?>"><?php echo $user->user_login ?></a></td>
+    <td><?php echo $user->user_email ?></td>
+    <td><?php echo $user->user_registered ?></td>
+    <td><a target="_blank" title="<?php _e('Tor Atlas Lookup', 'vigilantor') ?>" href="https://atlas.torproject.org/#search/<?php echo urlencode($user->tor_ip) ?>"><?php echo $user->tor_ip ?></a> / <a href="https://whois.arin.net/ui/query.do?queryinput=<?php echo $user->tor_ip ?>" target="_blank" title="<?php _e('Whois', 'vigilantor') ?>"><?php _e('Whois', 'vigilantor') ?></a></td>
+    <td>
+      <a href="<?php echo wp_nonce_url( "users.php?action=delete&amp;user={$user->user_id}&amp;wp_http_referer=" . urlencode($_SERVER['REQUEST_URI']) , 'bulk-users' ) ?>"><?php _e('Delete User', 'vigilantor') ?></a>
+      &nbsp;
+      <a href="#" onclick="vitorClearFlag(<?php echo $user->user_id ?>); return false">Clear Flag</a>
+    </tr>
+  <?php endforeach; ?>
+</table>
+
+<script type="text/javascript">
+function vitorClearFlag(user_id) {
+    jQuery.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        data: 'action=vitor_clear_flag&user_id=' + user_id
+    }).success(function(response) {
+        if (response.error == true) {
+            alert(response.message);
+        } else {
+            var tr = jQuery('#vitor_user_' + user_id);
+            tr.fadeOut(400, function(){
+                tr.remove();
+                if (jQuery('#vitor_flagged_registrations tr').length <= 1) {
+                    jQuery('#vitor_no_flagged_registrations').show();
+                    jQuery('#vitor_flagged_registrations').hide();
+                }
+            });
+        }
+    }).fail(function(resp) {
+        alert('An error occurred: ' + resp.responseText);
+    });
+}
+</script>

@@ -1,0 +1,330 @@
+<h1><?= __('VigilanTor', 'vigilantor') . ' ' . __('Settings', 'vigilantor') ?></h1>
+<a href="https://wordpress.org/support/plugin/vigilantor" target="_blank"><?php _e('Plugin Support', 'vigilantor') ?></a>&nbsp; - &nbsp;
+<a href="https://drew-phillips.com/contact/" target="_blank"><?php _e('Contact Author', 'vigilantor') ?></a>&nbsp; - &nbsp;
+<a href="https://wordpress.org/support/view/plugin-reviews/vigilantor#postform" target="_blank"><?php _e('Rate This Plugin', 'vigilantor') ?></a>&nbsp; - &nbsp;
+<a href="https://drew-phillips.com/tor-nodes/" target="_blank"><?php _e('Sponsor a Tor Relay', 'vigilantor') ?></a>&nbsp; - &nbsp;
+<a href="https://drew-phillips.com/donate/" target="_blank"><?php _e('Donate', 'vigilantor') ?></a>
+<br>
+
+<?php if (!empty($admin_message)): ?>
+<div id="admin_message" class="<?php echo $message_class ?>"><?php echo $admin_message ?></div>
+<script type="text/javascript">setTimeout(function() { jQuery('#admin_message').fadeOut(800); }, 8000);</script>
+<?php endif; ?>
+
+<p>
+<?php if (!empty($lastError)): ?>
+<strong><?php _e('Last update failed! Reason: ', 'vigilantor') ?></strong> <?php echo $lastError ?>
+<?php elseif (isset($updateDate)): ?>
+<?php printf(__('The exit list contains %s Tor exit relay IP addresses (both IPv4 and IPv6).  Last updated on %s at %s.'),
+                '<b>' . number_format(sizeof($this->getExitList())) . '</b>', '<b>' . $updateDate . '</b>', '<b>' . $updateTime . '</b>') ?>
+<?php endif; ?>
+&nbsp; <a href="<?= $this->getPluginSettingsUrl() ?>&amp;action=update"><?php _e('Update Now', 'vigilantor') ?></a>
+</p>
+
+<?php if (function_exists('siwp_get_plugin_url')): ?>
+<?= __(sprintf('Works with %s.', __('Securimage-WP', 'vigilantor')), 'vigilantor') ?><br>
+<?php endif; ?>
+<?php if (function_exists('hcap_display_hcaptcha')): ?>
+    <?= __(sprintf('Works with %s by %s.', __('hCaptcha for WordPress', 'vigilantor'), '<a href="https://hcaptcha.com/" target="_blank">hCaptcha</a>'), 'vigilantor') ?><br>
+<?php endif; ?>
+<?php if (class_exists('LoginWithAjax')): ?>
+<?= __(sprintf('Works with %s.', __('Login With Ajax plugin', 'vigilantor')), 'vigilantor') ?><br>
+<?php endif; ?>
+<?php if (function_exists('buddypress')): ?>
+<?= __(sprintf('Works with %s.', __('BuddyPress', 'vigilantor')), 'vigilantor') ?><br>
+<?php endif; ?>
+
+<h4><?php _e('Configure how VigilanTor should block Tor users from your WordPress site here.', 'vigilantor') ?></h4>
+
+<form method="post" action="options.php">
+<?php settings_fields('vigilantor'); ?>
+
+<table class="form-table">
+  <tr>
+    <th scope="row"><?php _e('Blocking Settings', 'vigilantor') ?></th>
+    <td>
+      <fieldset>
+        <legend class="screen-reader-text"><span><?php _e('Blocking Settings', 'vigilantor') ?></span></legend>
+        <label for="vitor_block_registration">
+          <input type="checkbox" id="vitor_block_registration" name="vitor_block_registration" value="1" <?php checked(1, get_option('vitor_block_registration', 0)) ?> onclick="if (jQuery(this).attr('checked')) jQuery('#vitor_flag_registration').prop('checked', false)">
+          <?php _e('Block Tor users from registering', 'vigilantor') ?>
+        </label>
+        <br>
+        <label for="vitor_flag_registration">
+          <input type="checkbox" id="vitor_flag_registration" name="vitor_flag_registration" value="1" <?php checked(1, get_option('vitor_flag_registration', 0)) ?> onclick="if (jQuery(this).attr('checked')) jQuery('#vitor_block_registration').prop('checked', false)">
+          <?php _e('Flag users who sign up using Tor', 'vigilantor') ?>
+        </label>
+        <br>
+        <label for="vitor_block_login">
+          <input type="checkbox" id="vitor_block_login" name="vitor_block_login" value="1" <?php checked(1, get_option('vitor_block_login', 0)) ?>>
+          <?php _e('Block Tor users from logging in', 'vigilantor') ?>&nbsp;
+          <span><small><?php _e('Useful for preventing brute for attacks', 'vigilantor') ?></small></span>
+        </label>
+        <br><br>
+        <label for="vitor_block_comments">
+          <input type="checkbox" id="vitor_block_comments" name="vitor_block_comments" value="1" <?php checked(1, get_option('vitor_block_comments', 0)) ?> onclick="if (this.checked) document.getElementById('vitor_hide_commentform').disabled = ''; else document.getElementById('vitor_block_commentform').disabled = 'disabled'">
+          <?php _e('Block Tor users from commenting', 'vigilantor') ?>
+        </label>
+        <div style="margin-left: 12px">
+          <label for="vitor_hide_commentform">
+            <input type="checkbox" id="vitor_hide_commentform" name="vitor_hide_commentform" value="1" <?php checked(1, get_option('vitor_hide_commentform', 0)) ?><?php if (get_option('vitor_block_comments', 0) == false) echo ' disabled="disabled"'; ?>>
+            <?php _e('Hide comment form from Tor users', 'vigilantor') ?><br>
+            <span><small><?php _e('Comment blocking must be enabled to hide comment form.', 'vigilantor'); ?> &nbsp;<?php _e('Comments remain visible to blocked users.', 'vigilantor') ?><br><?php _e('Your theme must implement the <em>comment_form_before</em> and <em>comment_form_after</em> action hooks for this to work.', 'vigilantor') ?></small></span>
+          </label>
+        </div>
+        <label for="vitor_block_trackbacks">
+          <input type="checkbox" id="vitor_block_trackbacks" name="vitor_block_trackbacks" value="1" <?php checked(1, get_option('vitor_block_trackbacks', 0)) ?>>
+          <?php _e('Block pings &amp; trackbacks from Tor addresses', 'vigilantor') ?>
+        </label>
+        <br><br>
+        <label for="vitor_block_everything">
+          <input type="checkbox" id="vitor_block_everything" name="vitor_block_everything" value="1" <?php checked(1, get_option('vitor_block_everything', 0)) ?> onclick="toggleBlockPageSelect()">
+          <?php _e('Block Tor users from all of WordPress', 'vigilantor') ?>
+        </label>
+        <br>
+        <label for="vigilantor_blocked_page">
+          <?php _e( 'Page to show when blocked:' , 'vigilantor'); echo '&nbsp; ' . wp_dropdown_pages( array( 'post_status' => array('private', 'publish'), 'name' => 'vitor_blocked_page', 'id' => 'vitor_blocked_page', 'echo' => 0, 'show_option_none' => __( '&mdash; None &mdash;' , 'vigilantor'), 'option_none_value' => '0', 'selected' => get_option( 'vitor_blocked_page' ) ) ); ?>
+          <br>
+          <span><small>
+            <?php _e('May not be compatible with all themes.  Make sure to test with your theme!', 'vigilantor') ?><br>
+            <?php _e('Select "None" if the block page displays incorrectly.', 'vigilantor') ?><br>
+            <em><?php _e('Hint: Create a private page to use for the block page.', 'vigilantor') ?></em>
+          </small></span>
+          <br>
+        </label>
+        <br>
+        <div id="vitor_custom_block_message_container">
+            <label for="vitor_tor_blocked_message">
+              <?php _e('Tor blocked message:', 'vigilantor') ?>
+              <?php
+              $message = get_option('vitor_tor_blocked_message', null);
+              if (empty($message)) $message = __('Sorry, you cannot access this website using Tor.', 'vigilantor');
+              ?>
+              <br>
+              <input type="text" id="vitor_tor_blocked_message" name="vitor_tor_blocked_message" value="<?php echo htmlspecialchars($message) ?>" size="50">
+              <br>
+              <span><small><?php _e('Message to show when a user is blocked based on the Tor IP list and the block page is set to "None".', 'vigilantor') ?></small></span>
+            </label>
+            <br>
+        </div>
+
+        <label for="vitor_use_hcaptcha">
+        <?php $disabled = (!$hCaptchaInstalled ? ' disabled="disabled" readonly' : ''); ?>
+        <input type="checkbox" id="vitor_use_hcaptcha" name="vitor_use_hcaptcha" value="1" <?php checked(1, get_option('vitor_use_hcaptcha', 0)); echo $disabled; ?>>
+        <?php _e('Allow Tor access by solving an hCaptcha challenge', 'vigilantor'); ?>
+        <br>
+        <span>
+          <small>
+              <?php _e('Block page will show a user-friendly CAPTCHA that respects privacy.', 'vigilantor'); ?>
+              <?php _e('Solving it allows temporary access to your site.', 'vigilantor'); ?>
+              <?php if (!$hCaptchaInstalled): ?>
+                  <br>
+                  <strong>
+                  <?= __(sprintf('Install "hCaptcha for Forms and More" to enable CAPTCHA protection. Learn more at <a href="%s" target="_blank">hcaptcha.com</a>.', 'https://hcaptcha.com/'), 'vigilantor'); ?>
+                  <?= __(sprintf(
+                  'Click <a href="%s">here</a> to install.',
+                      wp_nonce_url(add_query_arg(
+                      array('action' => 'install-plugin', 'plugin' => 'hcaptcha-for-forms-and-more'),
+                      admin_url('update.php')),
+                      'install-plugin_hcaptcha-for-forms-and-more'
+                  ))); ?>
+                  </strong>
+              <?php endif; ?>
+          </small>
+        </span>
+        </label>
+        <br>
+
+        <?php if (get_option('vigilantor_use_captcha', 0)): /* only show securimage if enabled */ ?>
+        <label for="vigilantor_use_captcha">
+          <?php $disabled = (!function_exists('siwp_captcha_html') ? ' disabled="disabled" readonly' : ''); ?>
+          <input type="checkbox" id="vitor_use_captcha" name="vitor_use_captcha" value="1" <?php checked(1, get_option('vitor_use_captcha', 0)); echo $disabled; ?>>
+          <?php _e('Allow Tor access by solving a CAPTCHA', 'vigilantor'); ?>
+          <br>
+          <span>
+            <small>
+              <?php _e('Block page will show a CAPTCHA.  If solved will allow temporary access to the site.', 'vigilantor'); ?>
+              <?php if (!empty($disabled)): ?>
+                <br>
+                <strong>
+                <?php _e('Install Securimage-WP to enable CAPTCHA protection.', 'vigilantor'); ?>
+                <?php echo __(sprintf(
+                         'Click <a href="%s">here</a> to install.',
+                         wp_nonce_url(add_query_arg(
+                             array('action' => 'install-plugin', 'plugin' => 'securimage-wp'),
+                             admin_url('update.php')),
+                             'install-plugin_securimage-wp'
+                         ))); ?>
+                </strong>
+              <?php endif; ?>
+            </small>
+          </span>
+        </label>
+        <br>
+        <?php endif; ?>
+      <br>
+      <label for="vitor_cloudflare_enabled">
+          <?php $cf_enabled = get_option('vitor_cloudflare_enabled', 0); ?>
+          <input type="checkbox" id="vitor_cloudflare_enabled" name="vitor_cloudflare_enabled"
+                 value="1" <?php checked(1, $cf_enabled) ?>>
+          <?php _e('Enable Cloudflare support', 'vigilantor') ?>
+          <br>
+          <?php if (!empty($_SERVER['HTTP_CF_REQUEST_ID'])): ?>
+              <?php if ($cf_enabled): ?>
+                  <span><small><?php _e('OK!'); ?> <?php _e('Your website appears to be using Cloudflare and Cloudflare support is enabled.', 'vigilantor'); ?></small></span>
+              <?php else: ?>
+                  <div style="padding: 1em" class="update-message notice inline notice-warning notice-alt">
+                      <?php _e('Warning!'); ?>
+                      <?php _e('Your website appears to be using Cloudflare but Cloudflare support is not enabled.', 'vigilantor'); ?>
+                      <br>
+                      <?php _e('If you are using Cloudflare but do not enable this option, checking for Tor will not work correctly.', 'vigilantor'); ?>
+                  </div>
+              <?php endif; ?>
+          <?php else: ?>
+              <?php if ($cf_enabled): ?>
+                  <div style="padding: 1em" class="update-message notice inline notice-warning notice-alt">
+                      <?php _e('Warning!'); ?>
+                      <?php _e('Cloudflare support is enabled but your website does not appear to be using Cloudflare. You should disable it.', 'vigilantor'); ?>
+                      <br>
+                      <?php _e('Tor checking can be tricked by spoofing the CF-Connecting-IP header!', 'vigilantor'); ?>
+                  </div>
+              <?php else: ?>
+                  <span><small><?php _e('OK!'); ?> <?php _e('You do not appear to be using Cloudflare and Cloudflare support is disabled.', 'vigilantor'); ?></small></span>
+              <?php endif; ?>
+          <?php endif; ?>
+      </label>
+    </fieldset>
+</table>
+
+<table class="form-table">
+  <tr>
+    <th scope="row"><?php _e('Detection Settings', 'vigilantor') ?></th>
+    <td>
+      <fieldset>
+        <legend class="screen-reader-text"><span><?php _e('Detection Settings', 'vigilantor') ?></span></legend>
+        <label for="vitor_el_update_frequency">
+          <?php _e('Exit list update frequency:', 'vigilantor') ?>
+          <select name="vitor_el_update_frequency">
+            <?php foreach($this->updateFrequencies as $name => $freq): ?>
+            <option value="<?php echo $name ?>"<?php if ($name == get_option('vitor_el_update_frequency', '_10m')): ?> selected="selected"<?php endif; ?>><?php echo $freq['display'] ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <br>
+        <label for="vitor_enable_realtime">
+          <input type="checkbox" id="vitor_enable_realtime" name="vitor_enable_realtime" value="1" <?php checked(1, get_option('vitor_enable_realtime', 0)) ?>>
+          <?php echo _e('Enable real-time checking.', 'vigilantor') ?> &nbsp;<span><small><?php _e('Each IP address result is cached for 5 minutes', 'vigilantor') ?></small></span>
+        </label>
+        <br>
+        <em>
+        <?php if ($this->hasUdpSupport()): ?>
+        <?php printf(__('You can use the real-time checks as %s streams are enabled.'), '<code>udp://</code>'); ?>
+        <?php else: ?>
+        <?php printf(__('Real time checking disabled.  Your PHP installation does not support the %s stream wrapper.'), '<code>udp://</code>') ?>
+        <?php endif; ?>
+        </em>
+        <br>
+        <label for="vitor_realtime_timeout">
+          <?php _e('Real time lookup timeout (seconds):', 'vigilantor') ?>
+          <?php _e('Real time lookup timeout (seconds):', 'vigilantor') ?><?php $timeout = (int)get_option('vitor_realtime_timeout', 3); ?>
+          <input type="text" id="vitor_realtime_timeout" name="vitor_realtime_timeout" value="<?php echo (empty($timeout) ? 3 : htmlspecialchars($timeout)) ?>" size="4">
+        </label>
+        <br>
+      </fieldset>
+
+    </td>
+  </tr>
+</table>
+
+<table class="form-table">
+  <tr>
+    <th scope="row"><?php _e('Custom Blocking', 'vigilantor') ?></th>
+    <td>
+      <fieldset>
+        <legend class="screen-reader-text"><span><?php _e('Custom Blocking', 'vigilantor') ?></span></legend>
+        <label for="vitor_custom_blocklist_enabled">
+          <input type="checkbox" id="vitor_custom_blocklist_enabled" name="vitor_custom_blocklist_enabled" value="1" <?php checked(1, get_option('vitor_custom_blocklist_enabled', 0)) ?>>
+          <?php echo _e('Enable and use the custom blocklist', 'vigilantor') ?> &nbsp;<span><small><?php _e('Block IP addresses or hostnames from the custom list in addition to Tor relays', 'vigilantor') ?></small></span>
+        </label>
+        <br>
+        <label for="vitor_el_update_frequency">
+          <?php _e('Custom Blocklist:', 'vigilantor') ?>
+          <br>
+          <textarea name="vitor_custom_blocklist" style="width: 400px; height: 200px"><?php echo get_site_option('vitor_custom_blocklist', '') ?></textarea>
+        </label>
+        <br>
+        <textarea id="custom_list" style="display: none; width: 400px; height: 200px;"># This is the output of your custom block list<?php echo "\n" . implode("\n", VigilanTorWP::run()->getCustomBlocklist()) ?></textarea>
+        <a href="#" onclick="document.getElementById('custom_list').style.display = ''; this.style.display = 'none'; return false"><?php _e('Show processed block list', 'vigilantor') ?></a>
+        <p>&nbsp;</p>
+        <label for="vitor_custom_block_message">
+          <?php _e('Custom block message:', 'vigilantor') ?>
+          <?php
+          $message = get_option('vitor_custom_block_message', null);
+          if (empty($message)) $message = __('Sorry, your IP address or network is blocked from accessing this site.', 'vigilantor');
+          ?>
+          <br>
+          <input type="text" id="vitor_custom_block_message" name="vitor_custom_block_message" value="<?php echo htmlspecialchars($message) ?>" size="50">
+          <br>
+          <span><small><?php _e('Message to show when a user is blocked based on the custom blocklist.', 'vigilantor') ?></small></span>
+        </label>
+      </fieldset>
+    </td>
+  </tr>
+</table>
+
+<p class="submit clear">
+    <input type="submit" value="<?php _e('Save Settings', 'vigilantor') ?>" class="button-primary">
+</p>
+</form>
+
+<hr>
+<?php include 'flagged_users.phtml' ?>
+
+<hr>
+<?php include 'statistics.phtml' ?>
+
+<script type="text/javascript">
+    jQuery(function() {
+        toggleBlockPageSelect();
+        toggleShowBlockedMessage();
+
+        <?php if (!$this->hasUdpSupport()): ?>
+        jQuery('#vitor_enable_realtime').prop('disabled', true);
+        jQuery('#vitor_realtime_timeout').prop('disabled', true);
+        <?php endif; ?>
+
+        jQuery('#vitor_blocked_page').on('change', function() {
+            toggleShowBlockedMessage();
+        });
+    });
+
+    function toggleBlockPageSelect()
+    {
+        if (jQuery('#vitor_block_everything').attr('checked')) {
+            jQuery('#vitor_blocked_page').removeProp('disabled');
+            jQuery('#vitor_use_captcha').removeProp('disabled');
+            jQuery('#vitor_use_hcaptcha').removeProp('disabled');
+        } else {
+            jQuery('#vitor_blocked_page').prop('disabled', true);
+            jQuery('#vitor_use_captcha').prop('disabled', true);
+            jQuery('#vitor_use_hcaptcha').prop('disabled', true);
+        }
+    }
+
+    function toggleShowBlockedMessage()
+    {
+        if (jQuery('#vitor_blocked_page').val() == 0) {
+            jQuery('#vitor_custom_block_message_container').show();
+        } else {
+            jQuery('#vitor_custom_block_message_container').hide();
+        }
+    }
+
+    function confirmDelete() {
+        return confirm('<?php echo addslashes(__('Are you sure you want to delete this feed shortcode?')) ?>');
+    }
+
+    function confirmClearCache() {
+        return confirm('<?php echo addslashes(__('Are you sure you wish to clear the feed cache?')) ?>');
+    }
+</script>
